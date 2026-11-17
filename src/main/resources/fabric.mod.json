@@ -1,0 +1,29 @@
+{
+	"schemaVersion": 1,
+	"id": "inventoryshift",
+	"version": "${version}",
+	"name": "Inventory Shift",
+	"description": "Press Tab to shift every inventory row down one step, so the row above the hotbar becomes your hotbar. Shift+Tab shifts the other way.",
+	"authors": [
+		"martin-popov"
+	],
+	"contact": {
+		"homepage": "https://github.com/martin-popov/inventory-shift",
+		"sources": "https://github.com/martin-popov/inventory-shift",
+		"issues": "https://github.com/martin-popov/inventory-shift/issues"
+	},
+	"license": "MIT",
+	"environment": "client",
+	"entrypoints": {
+		"client": [
+			"com.martinpopov.inventoryshift.client.InventoryShiftClient"
+		]
+	},
+	"depends": {
+		"fabricloader": ">=0.20.1",
+		"minecraft": "~26.3",
+		"java": ">=25",
+		"fabric-key-mapping-api-v1": "*",
+		"fabric-lifecycle-events-v1": "*"
+	}
+}
