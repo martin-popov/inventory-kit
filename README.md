@@ -15,7 +15,7 @@ Armour, the offhand slot and the crafting grid are never touched.
 | Shift one column | Alt + Tab moves only the column of the selected hotbar slot. There is also a separate, unbound "Shift Selected Column" key. | Alt |
 | Scroll-wheel shifting | Hold Alt and scroll. Down moves the rows down, up moves them back. Can be set to move only the selected column. | On, all rows |
 | Locked hotbar slots | Press Y to lock or unlock the selected hotbar slot. A locked slot's column never moves and shows a small gold line on the hotbar. | Y |
-| Next-row preview | A small strip above the hotbar shows the row the next shift brings in. Hold Shift to see the reverse direction. | Always |
+| Next-row preview | A small strip above the hotbar shows the row the next shift brings in. Hold Shift to see the reverse direction. Turn it on in the settings. | Off |
 | Feedback | A soft pop sound and a bounce on the items that arrive in the hotbar. | On |
 | Skip empty rows | Rows that are completely empty are jumped past, so the hotbar never lands on nothing. | On |
 

@@ -62,7 +62,7 @@ public final class InventoryShiftConfig {
 	/** Hotbar slots (0-8) whose column never moves. */
 	public boolean[] lockedSlots = new boolean[ShiftPlan.COLUMNS];
 
-	public PreviewMode previewMode = PreviewMode.ALWAYS;
+	public PreviewMode previewMode = PreviewMode.OFF;
 	/** Extra pixels to raise the preview strip by; negative lowers it. */
 	public int previewOffsetY = 0;
 
