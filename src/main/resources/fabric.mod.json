@@ -3,7 +3,7 @@
 	"id": "inventoryshift",
 	"version": "${version}",
 	"name": "Inventory Shift",
-	"description": "Press Tab to shift every inventory row down one step, so the row above the hotbar becomes your hotbar. Shift+Tab shifts the other way.",
+	"description": "Press Tab to shift every inventory row down one step, so the row above the hotbar becomes your hotbar. Shift+Tab shifts the other way. Also shifts single columns, works with the scroll wheel, and can lock hotbar slots in place.",
 	"authors": [
 		"martin-popov"
 	],
@@ -17,13 +17,27 @@
 	"entrypoints": {
 		"client": [
 			"com.martinpopov.inventoryshift.client.InventoryShiftClient"
+		],
+		"modmenu": [
+			"com.martinpopov.inventoryshift.client.compat.ModMenuIntegration"
 		]
 	},
+	"mixins": [
+		{
+			"config": "inventoryshift.client.mixins.json",
+			"environment": "client"
+		}
+	],
 	"depends": {
 		"fabricloader": ">=0.20.1",
 		"minecraft": "~26.3",
 		"java": ">=25",
 		"fabric-key-mapping-api-v1": "*",
-		"fabric-lifecycle-events-v1": "*"
+		"fabric-lifecycle-events-v1": "*",
+		"fabric-rendering-v1": "*"
+	},
+	"suggests": {
+		"modmenu": "*",
+		"yet_another_config_lib_v3": "*"
 	}
 }

@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Works out which slot swaps rotate the player's inventory rows by one step.
+ * Works out which slot swaps rotate the player's inventory rows.
  *
  * <p>Slot numbers are those of the player inventory menu: the three storage
  * rows are 9-17 (top), 18-26 (middle) and 27-35 (bottom, just above the
@@ -16,6 +16,7 @@ import java.util.List;
  */
 public final class ShiftPlan {
 	public static final int COLUMNS = 9;
+	public static final int ROWS = 4;
 	public static final int TOP_ROW_START = 9;
 	public static final int MIDDLE_ROW_START = 18;
 	public static final int BOTTOM_ROW_START = 27;
@@ -32,22 +33,61 @@ public final class ShiftPlan {
 	}
 
 	/**
-	 * Forward: every row moves down one step. The bottom row becomes the
-	 * hotbar and the old hotbar wraps round to the top row.
+	 * Swaps that rotate the given columns by {@code steps} steps.
 	 *
-	 * <p>Reverse: every row moves up one step. The top row becomes the hotbar
-	 * and the old hotbar becomes the bottom row.
+	 * <p>Forward: every row moves down one step per step. The bottom row
+	 * becomes the hotbar and the old hotbar wraps round to the top row.
+	 *
+	 * <p>Reverse: every row moves up. The top row becomes the hotbar and the
+	 * old hotbar becomes the bottom row.
+	 *
+	 * <p>Three steps one way are sent as a single step the other way, since
+	 * the result is the same and it takes a third of the clicks.
 	 */
-	public static List<Swap> swaps(boolean reverse) {
-		int[] order = reverse ? REVERSE_ORDER : FORWARD_ORDER;
-		List<Swap> swaps = new ArrayList<>(COLUMNS * order.length);
+	public static List<Swap> swaps(boolean reverse, int steps, int... columns) {
+		int normalized = Math.floorMod(steps, ROWS);
 
-		for (int column = 0; column < COLUMNS; column++) {
-			for (int rowStart : order) {
-				swaps.add(new Swap(rowStart + column, column));
+		if (normalized == 3) {
+			reverse = !reverse;
+			normalized = 1;
+		}
+
+		int[] order = reverse ? REVERSE_ORDER : FORWARD_ORDER;
+		List<Swap> swaps = new ArrayList<>(normalized * columns.length * order.length);
+
+		for (int step = 0; step < normalized; step++) {
+			for (int column : columns) {
+				for (int rowStart : order) {
+					swaps.add(new Swap(rowStart + column, column));
+				}
 			}
 		}
 
 		return swaps;
+	}
+
+	/**
+	 * How many steps it takes until a row with items lands in the hotbar.
+	 *
+	 * @return 1 to 3, or 0 when all three storage rows are empty
+	 */
+	public static int stepsToFilledRow(boolean reverse, boolean topFilled, boolean middleFilled, boolean bottomFilled) {
+		boolean[] arrivalOrder = reverse
+				? new boolean[] {topFilled, middleFilled, bottomFilled}
+				: new boolean[] {bottomFilled, middleFilled, topFilled};
+
+		for (int i = 0; i < arrivalOrder.length; i++) {
+			if (arrivalOrder[i]) {
+				return i + 1;
+			}
+		}
+
+		return 0;
+	}
+
+	/** First slot of the storage row that lands in the hotbar after {@code steps} (1-3) steps. */
+	public static int arrivingRowStart(boolean reverse, int steps) {
+		int[] order = reverse ? FORWARD_ORDER : REVERSE_ORDER;
+		return order[steps - 1];
 	}
 }
