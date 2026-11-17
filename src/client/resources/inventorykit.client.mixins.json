@@ -1,8 +1,9 @@
 {
 	"required": true,
-	"package": "com.martinpopov.inventoryshift.client.mixin",
+	"package": "com.martinpopov.inventorykit.client.mixin",
 	"compatibilityLevel": "JAVA_25",
 	"client": [
+		"AbstractContainerScreenAccessor",
 		"MouseHandlerMixin"
 	],
 	"injectors": {

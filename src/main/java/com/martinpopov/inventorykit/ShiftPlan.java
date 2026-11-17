@@ -1,4 +1,4 @@
-package com.martinpopov.inventoryshift;
+package com.martinpopov.inventorykit;
 
 import java.util.ArrayList;
 import java.util.List;

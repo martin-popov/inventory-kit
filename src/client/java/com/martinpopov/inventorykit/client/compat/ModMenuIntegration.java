@@ -1,4 +1,4 @@
-package com.martinpopov.inventoryshift.client.compat;
+package com.martinpopov.inventorykit.client.compat;
 
 import com.terraformersmc.modmenu.api.ConfigScreenFactory;
 import com.terraformersmc.modmenu.api.ModMenuApi;

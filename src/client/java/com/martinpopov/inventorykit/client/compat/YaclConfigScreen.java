@@ -1,10 +1,10 @@
-package com.martinpopov.inventoryshift.client.compat;
+package com.martinpopov.inventorykit.client.compat;
 
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-import com.martinpopov.inventoryshift.ShiftPlan;
-import com.martinpopov.inventoryshift.client.InventoryShiftConfig;
+import com.martinpopov.inventorykit.ShiftPlan;
+import com.martinpopov.inventorykit.client.InventoryKitConfig;
 import dev.isxander.yacl3.api.ConfigCategory;
 import dev.isxander.yacl3.api.Option;
 import dev.isxander.yacl3.api.OptionDescription;
@@ -23,8 +23,8 @@ public final class YaclConfigScreen {
 	}
 
 	public static Screen create(Screen parent) {
-		InventoryShiftConfig config = InventoryShiftConfig.get();
-		InventoryShiftConfig defaults = new InventoryShiftConfig();
+		InventoryKitConfig config = InventoryKitConfig.get();
+		InventoryKitConfig defaults = new InventoryKitConfig();
 
 		OptionGroup.Builder lockedSlots = OptionGroup.createBuilder()
 				.name(text("group.locked"))
@@ -33,7 +33,7 @@ public final class YaclConfigScreen {
 		for (int column = 0; column < ShiftPlan.COLUMNS; column++) {
 			int slot = column;
 			lockedSlots.option(Option.<Boolean>createBuilder()
-					.name(Component.translatable("config.inventoryshift.locked_slot", slot + 1))
+					.name(Component.translatable("config.inventorykit.locked_slot", slot + 1))
 					.binding(false, () -> config.lockedSlots[slot], value -> config.lockedSlots[slot] = value)
 					.controller(TickBoxControllerBuilder::create)
 					.build());
@@ -46,20 +46,20 @@ public final class YaclConfigScreen {
 						.group(OptionGroup.createBuilder()
 								.name(text("group.shifting"))
 								.option(toggle("skip_empty", defaults.skipEmptyRows, () -> config.skipEmptyRows, value -> config.skipEmptyRows = value))
-								.option(choice("column_modifier", InventoryShiftConfig.Modifier.class, "modifier",
+								.option(choice("column_modifier", InventoryKitConfig.Modifier.class, "modifier",
 										defaults.columnModifier, () -> config.columnModifier, value -> config.columnModifier = value))
 								.build())
 						.group(OptionGroup.createBuilder()
 								.name(text("group.scroll"))
 								.option(toggle("scroll_enabled", defaults.scrollEnabled, () -> config.scrollEnabled, value -> config.scrollEnabled = value))
-								.option(choice("scroll_modifier", InventoryShiftConfig.Modifier.class, "modifier",
+								.option(choice("scroll_modifier", InventoryKitConfig.Modifier.class, "modifier",
 										defaults.scrollModifier, () -> config.scrollModifier, value -> config.scrollModifier = value))
-								.option(choice("scroll_target", InventoryShiftConfig.ScrollTarget.class, "scroll_target",
+								.option(choice("scroll_target", InventoryKitConfig.ScrollTarget.class, "scroll_target",
 										defaults.scrollTarget, () -> config.scrollTarget, value -> config.scrollTarget = value))
 								.build())
 						.group(OptionGroup.createBuilder()
 								.name(text("group.preview"))
-								.option(choice("preview_mode", InventoryShiftConfig.PreviewMode.class, "preview_mode",
+								.option(choice("preview_mode", InventoryKitConfig.PreviewMode.class, "preview_mode",
 										defaults.previewMode, () -> config.previewMode, value -> config.previewMode = value))
 								.option(Option.<Integer>createBuilder()
 										.name(text("preview_offset"))
@@ -73,15 +73,22 @@ public final class YaclConfigScreen {
 								.option(toggle("sound", defaults.sound, () -> config.sound, value -> config.sound = value))
 								.option(toggle("animation", defaults.animation, () -> config.animation, value -> config.animation = value))
 								.build())
+						.group(OptionGroup.createBuilder()
+								.name(text("group.containers"))
+								.option(toggle("container_buttons", defaults.containerButtons, () -> config.containerButtons, value -> config.containerButtons = value))
+								.option(choice("sort_mode", InventoryKitConfig.SortMode.class, "sort_mode",
+										defaults.sortMode, () -> config.sortMode, value -> config.sortMode = value))
+								.option(toggle("deposit_from_hotbar", defaults.depositFromHotbar, () -> config.depositFromHotbar, value -> config.depositFromHotbar = value))
+								.build())
 						.group(lockedSlots.build())
 						.build())
-				.save(InventoryShiftConfig::save)
+				.save(InventoryKitConfig::save)
 				.build()
 				.generateScreen(parent);
 	}
 
 	private static Component text(String key) {
-		return Component.translatable("config.inventoryshift." + key);
+		return Component.translatable("config.inventorykit." + key);
 	}
 
 	private static Option<Boolean> toggle(String key, boolean defaultValue, Supplier<Boolean> getter, Consumer<Boolean> setter) {

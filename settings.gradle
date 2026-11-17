@@ -10,4 +10,4 @@ pluginManagement {
 }
 
 // Should match the mod id
-rootProject.name = 'inventoryshift'
+rootProject.name = 'inventorykit'

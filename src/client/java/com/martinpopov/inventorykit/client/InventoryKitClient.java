@@ -1,4 +1,4 @@
-package com.martinpopov.inventoryshift.client;
+package com.martinpopov.inventorykit.client;
 
 import com.mojang.blaze3d.platform.InputConstants;
 
@@ -10,31 +10,45 @@ import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements;
 
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 
-public class InventoryShiftClient implements ClientModInitializer {
-	public static final String MOD_ID = "inventoryshift";
+public class InventoryKitClient implements ClientModInitializer {
+	public static final String MOD_ID = "inventorykit";
 
 	private static KeyMapping shiftKey;
 	private static KeyMapping columnKey;
 	private static KeyMapping lockKey;
+	private static KeyMapping searchKey;
 
 	@Override
 	public void onInitializeClient() {
-		InventoryShiftConfig.load();
+		InventoryKitConfig.load();
 
-		shiftKey = register("key.inventoryshift.shift", InputConstants.KEY_TAB);
-		columnKey = register("key.inventoryshift.shift_column", InputConstants.UNKNOWN.getValue());
-		lockKey = register("key.inventoryshift.toggle_lock", InputConstants.KEY_Y);
+		shiftKey = register("key.inventorykit.shift", InputConstants.KEY_TAB);
+		columnKey = register("key.inventorykit.shift_column", InputConstants.UNKNOWN.getValue());
+		lockKey = register("key.inventorykit.toggle_lock", InputConstants.KEY_Y);
+		searchKey = register("key.inventorykit.search", InputConstants.KEY_SLASH);
 
-		ClientTickEvents.END_CLIENT_TICK.register(InventoryShiftClient::onEndTick);
+		ContainerButtons.register();
+
+		ClientTickEvents.END_CLIENT_TICK.register(InventoryKitClient::onEndTick);
 		HudElementRegistry.attachElementAfter(VanillaHudElements.HOTBAR, Identifier.fromNamespaceAndPath(MOD_ID, "overlay"), new ShiftHud());
 	}
 
 	private static KeyMapping register(String name, int defaultKey) {
 		return KeyMappingHelper.registerKeyMapping(new KeyMapping(name, defaultKey, KeyMapping.Category.INVENTORY));
+	}
+
+	/** Whether this key press is the "search items" key. It only does anything inside container screens. */
+	public static boolean isSearchKey(KeyEvent event) {
+		return searchKey != null && searchKey.matches(event);
+	}
+
+	public static Component searchKeyName() {
+		return searchKey.getTranslatedKeyMessage();
 	}
 
 	private static boolean reverseHeld() {
@@ -45,7 +59,7 @@ public class InventoryShiftClient implements ClientModInitializer {
 		Shifter.tick();
 
 		while (shiftKey.consumeClick()) {
-			if (InventoryShiftConfig.get().columnModifier.isDown()) {
+			if (InventoryKitConfig.get().columnModifier.isDown()) {
 				Shifter.shiftSelectedColumn(minecraft, reverseHeld());
 			} else {
 				Shifter.shiftRows(minecraft, reverseHeld());
@@ -68,12 +82,12 @@ public class InventoryShiftClient implements ClientModInitializer {
 			return;
 		}
 
-		InventoryShiftConfig config = InventoryShiftConfig.get();
+		InventoryKitConfig config = InventoryKitConfig.get();
 		int column = player.getInventory().getSelectedSlot();
 		config.lockedSlots[column] = !config.lockedSlots[column];
-		InventoryShiftConfig.save();
+		InventoryKitConfig.save();
 
-		String key = config.lockedSlots[column] ? "message.inventoryshift.locked" : "message.inventoryshift.unlocked";
+		String key = config.lockedSlots[column] ? "message.inventorykit.locked" : "message.inventorykit.unlocked";
 		minecraft.gui.hud.setOverlayMessage(Component.translatable(key, column + 1), false);
 	}
 }

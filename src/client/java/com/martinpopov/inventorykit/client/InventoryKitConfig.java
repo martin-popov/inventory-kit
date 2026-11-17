@@ -1,4 +1,4 @@
-package com.martinpopov.inventoryshift.client;
+package com.martinpopov.inventorykit.client;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -9,7 +9,7 @@ import java.nio.file.Path;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonParseException;
-import com.martinpopov.inventoryshift.ShiftPlan;
+import com.martinpopov.inventorykit.ShiftPlan;
 import com.mojang.blaze3d.platform.InputConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,12 +17,14 @@ import org.slf4j.LoggerFactory;
 import net.fabricmc.loader.api.FabricLoader;
 
 /** Settings, stored as JSON in the game's config folder. */
-public final class InventoryShiftConfig {
-	private static final Logger LOGGER = LoggerFactory.getLogger("inventoryshift");
+public final class InventoryKitConfig {
+	private static final Logger LOGGER = LoggerFactory.getLogger("inventorykit");
 	private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
-	private static final Path PATH = FabricLoader.getInstance().getConfigDir().resolve("inventoryshift.json");
+	private static final Path PATH = FabricLoader.getInstance().getConfigDir().resolve("inventorykit.json");
+	/** Settings file from when the mod was called Inventory Shift. */
+	private static final Path OLD_PATH = FabricLoader.getInstance().getConfigDir().resolve("inventoryshift.json");
 
-	private static InventoryShiftConfig instance = new InventoryShiftConfig();
+	private static InventoryKitConfig instance = new InventoryKitConfig();
 
 	public enum Modifier {
 		NONE,
@@ -49,6 +51,12 @@ public final class InventoryShiftConfig {
 		WHEN_SHIFTING
 	}
 
+	public enum SortMode {
+		/** The order of the creative menu, tab by tab. */
+		CATEGORY,
+		NAME
+	}
+
 	/** Skip past rows that are completely empty so the hotbar never lands on nothing. */
 	public boolean skipEmptyRows = true;
 
@@ -69,7 +77,13 @@ public final class InventoryShiftConfig {
 	public boolean sound = true;
 	public boolean animation = true;
 
-	public static InventoryShiftConfig get() {
+	/** Show the deposit, take, sort and search buttons on storage screens and the inventory. */
+	public boolean containerButtons = true;
+	public SortMode sortMode = SortMode.CATEGORY;
+	/** Whether the deposit buttons also empty the hotbar. Locked hotbar slots are never emptied. */
+	public boolean depositFromHotbar = true;
+
+	public static InventoryKitConfig get() {
 		return instance;
 	}
 
@@ -78,21 +92,27 @@ public final class InventoryShiftConfig {
 	}
 
 	public static void load() {
-		if (!Files.exists(PATH)) {
-			instance = new InventoryShiftConfig();
+		Path source = Files.exists(PATH) ? PATH : OLD_PATH;
+
+		if (!Files.exists(source)) {
+			instance = new InventoryKitConfig();
 			save();
 			return;
 		}
 
-		try (Reader reader = Files.newBufferedReader(PATH)) {
-			InventoryShiftConfig loaded = GSON.fromJson(reader, InventoryShiftConfig.class);
-			instance = loaded != null ? loaded : new InventoryShiftConfig();
+		try (Reader reader = Files.newBufferedReader(source)) {
+			InventoryKitConfig loaded = GSON.fromJson(reader, InventoryKitConfig.class);
+			instance = loaded != null ? loaded : new InventoryKitConfig();
 		} catch (IOException | JsonParseException e) {
-			LOGGER.warn("Could not read {}, using default settings", PATH, e);
-			instance = new InventoryShiftConfig();
+			LOGGER.warn("Could not read {}, using default settings", source, e);
+			instance = new InventoryKitConfig();
 		}
 
 		instance.repair();
+
+		if (source != PATH) {
+			save();
+		}
 	}
 
 	public static void save() {
@@ -105,7 +125,7 @@ public final class InventoryShiftConfig {
 
 	/** Fills in anything a hand-edited or older file left missing. */
 	private void repair() {
-		InventoryShiftConfig defaults = new InventoryShiftConfig();
+		InventoryKitConfig defaults = new InventoryKitConfig();
 
 		if (columnModifier == null) {
 			columnModifier = defaults.columnModifier;
@@ -121,6 +141,10 @@ public final class InventoryShiftConfig {
 
 		if (previewMode == null) {
 			previewMode = defaults.previewMode;
+		}
+
+		if (sortMode == null) {
+			sortMode = defaults.sortMode;
 		}
 
 		if (lockedSlots == null || lockedSlots.length != ShiftPlan.COLUMNS) {

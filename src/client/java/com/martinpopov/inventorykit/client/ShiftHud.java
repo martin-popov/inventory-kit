@@ -1,6 +1,6 @@
-package com.martinpopov.inventoryshift.client;
+package com.martinpopov.inventorykit.client;
 
-import com.martinpopov.inventoryshift.ShiftPlan;
+import com.martinpopov.inventorykit.ShiftPlan;
 import com.mojang.blaze3d.platform.InputConstants;
 
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElement;
@@ -28,7 +28,7 @@ public final class ShiftHud implements HudElement {
 			return;
 		}
 
-		InventoryShiftConfig config = InventoryShiftConfig.get();
+		InventoryKitConfig config = InventoryKitConfig.get();
 		extractLockMarkers(graphics, config);
 
 		if (shouldShowPreview(config)) {
@@ -36,7 +36,7 @@ public final class ShiftHud implements HudElement {
 		}
 	}
 
-	private static void extractLockMarkers(GuiGraphicsExtractor graphics, InventoryShiftConfig config) {
+	private static void extractLockMarkers(GuiGraphicsExtractor graphics, InventoryKitConfig config) {
 		int hotbarLeft = graphics.guiWidth() / 2 - 88;
 		int y = graphics.guiHeight() - 3;
 
@@ -48,7 +48,7 @@ public final class ShiftHud implements HudElement {
 		}
 	}
 
-	private static boolean shouldShowPreview(InventoryShiftConfig config) {
+	private static boolean shouldShowPreview(InventoryKitConfig config) {
 		return switch (config.previewMode) {
 			case OFF -> false;
 			case ALWAYS -> true;
@@ -58,7 +58,7 @@ public final class ShiftHud implements HudElement {
 		};
 	}
 
-	private static void extractPreview(GuiGraphicsExtractor graphics, Minecraft minecraft, Inventory inventory, InventoryShiftConfig config) {
+	private static void extractPreview(GuiGraphicsExtractor graphics, Minecraft minecraft, Inventory inventory, InventoryKitConfig config) {
 		boolean reverse = InputConstants.isKeyDown(InputConstants.KEY_LSHIFT) || InputConstants.isKeyDown(InputConstants.KEY_RSHIFT);
 		int[] columns = Shifter.unlockedColumns();
 		int steps = Shifter.plannedSteps(inventory, reverse, columns);

@@ -1,8 +1,8 @@
-package com.martinpopov.inventoryshift.client;
+package com.martinpopov.inventorykit.client;
 
 import java.util.List;
 
-import com.martinpopov.inventoryshift.ShiftPlan;
+import com.martinpopov.inventorykit.ShiftPlan;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
@@ -47,13 +47,13 @@ public final class Shifter {
 
 		int column = player.getInventory().getSelectedSlot();
 
-		if (!InventoryShiftConfig.get().isLocked(column)) {
+		if (!InventoryKitConfig.get().isLocked(column)) {
 			shift(minecraft, reverse, new int[] {column});
 		}
 	}
 
 	public static int[] unlockedColumns() {
-		InventoryShiftConfig config = InventoryShiftConfig.get();
+		InventoryKitConfig config = InventoryKitConfig.get();
 		int count = 0;
 
 		for (int column = 0; column < ShiftPlan.COLUMNS; column++) {
@@ -83,7 +83,7 @@ public final class Shifter {
 			return 0;
 		}
 
-		if (!InventoryShiftConfig.get().skipEmptyRows) {
+		if (!InventoryKitConfig.get().skipEmptyRows) {
 			return 1;
 		}
 
@@ -138,7 +138,7 @@ public final class Shifter {
 		}
 
 		previewLingerTicks = PREVIEW_LINGER_TICKS;
-		InventoryShiftConfig config = InventoryShiftConfig.get();
+		InventoryKitConfig config = InventoryKitConfig.get();
 
 		if (config.animation) {
 			for (int column : columns) {

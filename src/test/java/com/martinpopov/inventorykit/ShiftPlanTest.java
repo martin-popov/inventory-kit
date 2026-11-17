@@ -1,4 +1,4 @@
-package com.martinpopov.inventoryshift;
+package com.martinpopov.inventorykit;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
