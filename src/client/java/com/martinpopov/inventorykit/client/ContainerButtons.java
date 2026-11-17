@@ -1,13 +1,17 @@
 package com.martinpopov.inventorykit.client;
 
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.IntSupplier;
 
 import com.martinpopov.inventorykit.client.mixin.AbstractContainerScreenAccessor;
 
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
+import net.fabricmc.fabric.api.client.screen.v1.ScreenKeyboardEvents;
 import net.fabricmc.fabric.api.client.screen.v1.Screens;
 
+import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Tooltip;
@@ -57,24 +61,60 @@ public final class ContainerButtons {
 		List<AbstractWidget> widgets = Screens.getWidgets(screen);
 		ItemSearch search = ItemSearch.attach(screen, window, widgets);
 
+		Runnable sortInventory = () -> InventoryActions.sort(minecraft, menu, InventoryActions.storageSlots(menu));
+		Map<KeyMapping, Runnable> keys = new LinkedHashMap<>();
+		keys.put(InventoryKitClient.sortInventoryKey, sortInventory);
+
 		if (playerInventory) {
 			IntSupplier y = () -> window.getTopPos() + INVENTORY_BUTTON_Y;
-			widgets.add(sortButton(minecraft, column(window, 0), y, () -> InventoryActions.sort(minecraft, menu, InventoryActions.storageSlots(menu))));
+			widgets.add(sortButton(minecraft, column(window, 0), y, sortInventory));
 			widgets.add(searchButton(column(window, 1), y, search));
+			registerKeys(screen, search, keys);
 			return;
 		}
+
+		Runnable sortContainer = () -> InventoryActions.sort(minecraft, menu, InventoryActions.containerSlots(menu));
+		Runnable takeAll = () -> InventoryActions.take(minecraft, menu, false);
+		Runnable takeMatching = () -> InventoryActions.take(minecraft, menu, true);
+		Runnable depositAll = () -> InventoryActions.deposit(minecraft, menu, false);
+		Runnable depositMatching = () -> InventoryActions.deposit(minecraft, menu, true);
+		keys.put(InventoryKitClient.sortContainerKey, sortContainer);
+		keys.put(InventoryKitClient.takeAllKey, takeAll);
+		keys.put(InventoryKitClient.takeMatchingKey, takeMatching);
+		keys.put(InventoryKitClient.depositAllKey, depositAll);
+		keys.put(InventoryKitClient.depositMatchingKey, depositMatching);
+		registerKeys(screen, search, keys);
 
 		IntSupplier containerRow = () -> window.getTopPos() + window.getTitleLabelY() - 2;
 		IntSupplier inventoryRow = () -> window.getTopPos() + window.getInventoryLabelY() - 2;
 
-		widgets.add(sortButton(minecraft, column(window, 0), containerRow, () -> InventoryActions.sort(minecraft, menu, InventoryActions.containerSlots(menu))));
-		widgets.add(button(column(window, 1), containerRow, IconButton.TAKE_ALL, "take_all", () -> InventoryActions.take(minecraft, menu, false)));
-		widgets.add(button(column(window, 2), containerRow, IconButton.TAKE_MATCHING, "take_matching", () -> InventoryActions.take(minecraft, menu, true)));
+		// Added left to right, so Tab walks through them in the order they appear.
 		widgets.add(searchButton(column(window, 3), containerRow, search));
+		widgets.add(button(column(window, 2), containerRow, IconButton.TAKE_MATCHING, "take_matching", takeMatching));
+		widgets.add(button(column(window, 1), containerRow, IconButton.TAKE_ALL, "take_all", takeAll));
+		widgets.add(sortButton(minecraft, column(window, 0), containerRow, sortContainer));
 
-		widgets.add(sortButton(minecraft, column(window, 0), inventoryRow, () -> InventoryActions.sort(minecraft, menu, InventoryActions.storageSlots(menu))));
-		widgets.add(button(column(window, 1), inventoryRow, IconButton.DEPOSIT_ALL, "deposit_all", () -> InventoryActions.deposit(minecraft, menu, false)));
-		widgets.add(button(column(window, 2), inventoryRow, IconButton.DEPOSIT_MATCHING, "deposit_matching", () -> InventoryActions.deposit(minecraft, menu, true)));
+		widgets.add(button(column(window, 2), inventoryRow, IconButton.DEPOSIT_MATCHING, "deposit_matching", depositMatching));
+		widgets.add(button(column(window, 1), inventoryRow, IconButton.DEPOSIT_ALL, "deposit_all", depositAll));
+		widgets.add(sortButton(minecraft, column(window, 0), inventoryRow, sortInventory));
+	}
+
+	/** Lets each button's action be bound to a key. The keys are ignored while the search box is being typed in. */
+	private static void registerKeys(Screen screen, ItemSearch search, Map<KeyMapping, Runnable> keys) {
+		ScreenKeyboardEvents.allowKeyPress(screen).register((s, event) -> {
+			if (search.isTyping()) {
+				return true;
+			}
+
+			for (Map.Entry<KeyMapping, Runnable> entry : keys.entrySet()) {
+				if (entry.getKey().matches(event)) {
+					entry.getValue().run();
+					return false;
+				}
+			}
+
+			return true;
+		});
 	}
 
 	/** X position of a button, counted from the right edge of the window. */

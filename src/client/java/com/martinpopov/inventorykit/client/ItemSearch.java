@@ -89,6 +89,11 @@ public final class ItemSearch {
 		return window.getTopPos() - BOX_HEIGHT - BOX_GAP;
 	}
 
+	/** Whether key presses are currently going into the search box. */
+	public boolean isTyping() {
+		return box.isVisible() && box.isFocused();
+	}
+
 	public void toggle() {
 		if (box.isVisible()) {
 			close();
@@ -114,7 +119,7 @@ public final class ItemSearch {
 
 	/** @return false to keep the key away from the screen */
 	private boolean allowKeyPress(KeyEvent event) {
-		boolean typing = box.isVisible() && box.isFocused();
+		boolean typing = isTyping();
 
 		if (!typing && InventoryKitClient.isSearchKey(event)) {
 			open();

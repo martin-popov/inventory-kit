@@ -21,7 +21,7 @@ Armour, the offhand slot and the crafting grid are never touched.
 | Shift all rows | Tab, or Shift + Tab to reverse | On |
 | Shift one column | Alt + Tab moves only the column of the selected hotbar slot. There is also a separate, unbound "Shift Selected Column" key. | Alt |
 | Scroll-wheel shifting | Hold Alt and scroll. Down moves the rows down, up moves them back. Can be set to move only the selected column. | On, all rows |
-| Locked hotbar slots | Press Y to lock or unlock the selected hotbar slot. A locked slot's column never moves, and the deposit buttons leave it alone. It shows a small gold line on the hotbar. | Y |
+| Locked hotbar slots | Press Y to lock or unlock the selected hotbar slot. A locked slot's column never moves, and the deposit buttons leave it alone. It shows a padlock and a gold bar on the hotbar. | Y |
 | Next-row preview | A small strip above the hotbar shows the row the next shift brings in. Hold Shift to see the reverse direction. Turn it on in the settings. | Off |
 | Feedback | A soft pop sound and a bounce on the items that arrive in the hotbar. | On |
 | Skip empty rows | Rows that are completely empty are jumped past, so the hotbar never lands on nothing. | On |
@@ -65,7 +65,16 @@ Press **/** in a chest or your inventory, or click the magnifier button, and sta
 
 With [Mod Menu](https://modrinth.com/mod/modmenu) and [YACL](https://modrinth.com/mod/yacl) installed, the mod has a settings screen in the Mods list. Both are optional; without them, edit `config/inventorykit.json` by hand.
 
-The keys are listed under **Options → Controls → Key Binds → Inventory** and can be rebound. Tab is also the vanilla player list key; both fire when they share a key, so rebind one of them if that bothers you on multiplayer. On Windows, Alt + Tab belongs to the system, so pick Ctrl as the column modifier or bind the separate column key.
+The keys are listed under **Options → Controls → Key Binds → Inventory Kit** and can be rebound. Tab is also the vanilla player list key; both fire when they share a key, so rebind one of them if that bothers you on multiplayer. On Windows, Alt + Tab belongs to the system, so pick Ctrl as the column modifier or bind the separate column key.
+
+## Keyboard and accessibility
+
+- **No mouse needed.** Every chest button can be reached with Tab and pressed with Enter or Space, and each one also has its own key binding (unbound by default): sort container, sort inventory, deposit matching, deposit everything, take matching and take everything.
+- **No held keys needed.** Shift + Tab, Alt + Tab and Alt + scroll are shortcuts. "Shift Inventory Rows Back", "Shift Selected Column" and "Shift Selected Column Back" are separate single keys you can bind instead.
+- **Narrator.** Buttons and the search box have spoken names, and locking or unlocking a slot is read out.
+- **Not colour-only.** Search dims the items that do not match as well as outlining the ones that do, and locked slots are marked with a padlock shape as well as a gold bar.
+- **Motion and sound.** The hotbar bounce and the pop sound can each be turned off.
+- **Languages.** English, Bulgarian, German, Spanish and French. The translations were written by the author's tooling, not by native speakers, so corrections are welcome.
 
 ## How it works
 
