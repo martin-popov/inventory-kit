@@ -64,8 +64,8 @@ public final class ContainerButtons {
 			return;
 		}
 
-		IntSupplier containerRow = () -> window.getTopPos() + window.getTitleLabelY() - 1;
-		IntSupplier inventoryRow = () -> window.getTopPos() + window.getInventoryLabelY() - 1;
+		IntSupplier containerRow = () -> window.getTopPos() + window.getTitleLabelY() - 2;
+		IntSupplier inventoryRow = () -> window.getTopPos() + window.getInventoryLabelY() - 2;
 
 		widgets.add(sortButton(minecraft, column(window, 0), containerRow, () -> InventoryActions.sort(minecraft, menu, InventoryActions.containerSlots(menu))));
 		widgets.add(button(column(window, 1), containerRow, IconButton.TAKE_ALL, "take_all", () -> InventoryActions.take(minecraft, menu, false)));
