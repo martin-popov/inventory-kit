@@ -4,7 +4,7 @@
 	"key.inventorykit.shift_back": "Смяна на редовете в обратна посока",
 	"key.inventorykit.shift_column": "Смяна на избраната колона (с Shift – обратно)",
 	"key.inventorykit.shift_column_back": "Смяна на избраната колона в обратна посока",
-	"key.inventorykit.toggle_lock": "Заключване/отключване на избрания слот от лентата",
+	"key.inventorykit.toggle_lock": "Заключване/отключване на слот (избрания или под мишката)",
 	"key.inventorykit.search": "Търсене на предмети (в сандъци и инвентара)",
 	"key.inventorykit.sort_container": "Сортиране на контейнера",
 	"key.inventorykit.sort_inventory": "Сортиране на инвентара",
@@ -59,7 +59,7 @@
 	"config.inventorykit.deposit_from_hotbar": "Прибиране и от лентата",
 	"config.inventorykit.deposit_from_hotbar.description": "Дали бутоните за прибиране местят и предмети от лентата. Заключените слотове никога не се изпразват.",
 	"config.inventorykit.group.locked": "Заключени слотове",
-	"config.inventorykit.group.locked.description": "Колоната на заключен слот никога не се мести. Заключените слотове имат катинар и златна черта в лентата.",
+	"config.inventorykit.group.locked.description": "Заключен слот никога не се сменя, прибира или сортира. Това са слотовете от лентата; за да заключиш друг слот, посочи го в инвентара и натисни клавиша за заключване. Заключените слотове имат катинар.",
 	"config.inventorykit.locked_slot": "Заключване на слот %s",
 	"config.inventorykit.modifier.none": "Няма",
 	"config.inventorykit.modifier.alt": "Alt",
@@ -70,5 +70,14 @@
 	"config.inventorykit.preview_mode.always": "Винаги",
 	"config.inventorykit.preview_mode.when_shifting": "При смяна",
 	"config.inventorykit.sort_mode.category": "Категория",
-	"config.inventorykit.sort_mode.name": "Име"
+	"config.inventorykit.sort_mode.name": "Име",
+	"key.inventorykit.undo": "Отмяна на последното действие в сандъка",
+	"message.inventorykit.locked_storage": "Слотът в инвентара е заключен",
+	"message.inventorykit.unlocked_storage": "Слотът в инвентара е отключен",
+	"button.inventorykit.undo": "Отмяна",
+	"button.inventorykit.undo.tooltip": "Отмяна\nВръща всичко там, където е било преди последното прибиране, вземане или сортиране.",
+	"config.inventorykit.protect_in_use": "Без смяна, докато се използва предмет",
+	"config.inventorykit.protect_in_use.description": "Клавишите за смяна не действат, докато ядеш, опъваш лък, блокираш или копаеш, за да не се смени предметът в ръката ти.",
+	"config.inventorykit.clicks_per_tick": "Щраквания на тик в сървъри",
+	"config.inventorykit.clicks_per_tick.description": "В сървъри сортирането и местенето се разпределят с толкова щраквания на тик, за да не изглеждат като измама. 0 изпраща всичко наведнъж. В самостоятелна игра всичко винаги се изпраща наведнъж."
 }

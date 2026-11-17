@@ -9,29 +9,33 @@ import com.martinpopov.inventorykit.client.mixin.AbstractContainerScreenAccessor
 
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenKeyboardEvents;
+import net.fabricmc.fabric.api.client.screen.v1.ScreenMouseEvents;
 import net.fabricmc.fabric.api.client.screen.v1.Screens;
 
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.inventory.ChestMenu;
-import net.minecraft.world.inventory.DispenserMenu;
-import net.minecraft.world.inventory.HopperMenu;
-import net.minecraft.world.inventory.ShulkerBoxMenu;
+import net.minecraft.world.inventory.Slot;
 
-/** Adds the deposit, take, sort and search buttons to storage screens and the player inventory. */
+/**
+ * What the mod adds to container screens: the deposit, take, sort, undo and
+ * search buttons on storage screens and the player inventory, and slot
+ * locking on every screen that shows the player's inventory.
+ */
 public final class ContainerButtons {
 	/** Distance between the left edges of two neighbouring buttons. */
 	private static final int STEP = IconButton.SIZE + 1;
 	/** Gap between the window's right edge and the last button, matching the slot grid's margin. */
 	private static final int RIGHT_MARGIN = 7;
-	/** Where the sort button sits in the player inventory: the empty patch right of the recipe book button. */
+	/** Where the buttons sit in the player inventory: the empty patch right of the recipe book button. */
 	private static final int INVENTORY_BUTTON_Y = 66;
 
 	private ContainerButtons() {
@@ -39,36 +43,79 @@ public final class ContainerButtons {
 
 	public static void register() {
 		ScreenEvents.AFTER_INIT.register((minecraft, screen, width, height) -> {
-			if (InventoryKitConfig.get().containerButtons && screen instanceof AbstractContainerScreen<?> containerScreen) {
-				addButtons(minecraft, containerScreen);
+			// The creative screen lays the inventory out its own way.
+			if (screen instanceof AbstractContainerScreen<?> containerScreen && !(screen instanceof CreativeModeInventoryScreen)) {
+				attach(minecraft, containerScreen);
 			}
 		});
 	}
 
-	private static boolean isStorage(AbstractContainerMenu menu) {
-		return menu instanceof ChestMenu || menu instanceof ShulkerBoxMenu || menu instanceof DispenserMenu || menu instanceof HopperMenu;
-	}
-
-	private static void addButtons(Minecraft minecraft, AbstractContainerScreen<?> screen) {
+	private static void attach(Minecraft minecraft, AbstractContainerScreen<?> screen) {
 		AbstractContainerMenu menu = screen.getMenu();
-		boolean playerInventory = screen instanceof InventoryScreen;
+		AbstractContainerScreenAccessor window = (AbstractContainerScreenAccessor) screen;
 
-		if (!playerInventory && !isStorage(menu)) {
-			return;
+		// Registered first, so it is asked first: nothing gets through while clicks are being sent.
+		ScreenKeyboardEvents.allowKeyPress(screen).register((s, event) -> !ClickQueue.isBusy() || event.isEscape());
+		ScreenMouseEvents.allowMouseClick(screen).register((s, event) -> !ClickQueue.isBusy());
+
+		boolean playerInventory = screen instanceof InventoryScreen;
+		ItemSearch search = null;
+
+		if (InventoryKitConfig.get().containerButtons && (playerInventory || InventoryActions.isStorage(menu))) {
+			search = ItemSearch.attach(screen, window, Screens.getWidgets(screen));
+			addButtons(minecraft, screen, window, search, playerInventory);
 		}
 
-		AbstractContainerScreenAccessor window = (AbstractContainerScreenAccessor) screen;
+		ItemSearch finalSearch = search;
+		ScreenKeyboardEvents.allowKeyPress(screen).register((s, event) -> {
+			if (finalSearch != null && finalSearch.isTyping()) {
+				return true;
+			}
+
+			if (InventoryKitClient.lockKey.matches(event)) {
+				Slot hovered = window.getHoveredSlot();
+
+				if (hovered != null && InventoryActions.isInventorySlot(hovered)) {
+					InventoryKitClient.toggleLock(minecraft, hovered.getContainerSlot());
+				}
+
+				return false;
+			}
+
+			return true;
+		});
+
+		ScreenEvents.afterExtract(screen).register((s, graphics, mouseX, mouseY, partialTick) -> extractLocks(graphics, menu, window));
+		ScreenEvents.remove(screen).register(s -> InventoryActions.forget(menu));
+	}
+
+	private static void extractLocks(GuiGraphicsExtractor graphics, AbstractContainerMenu menu, AbstractContainerScreenAccessor window) {
+		InventoryKitConfig config = InventoryKitConfig.get();
+
+		for (Slot slot : menu.slots) {
+			if (slot.isActive() && InventoryActions.isInventorySlot(slot) && config.isLocked(slot.getContainerSlot())) {
+				LockBadge.extract(graphics, window.getLeftPos() + slot.x, window.getTopPos() + slot.y);
+			}
+		}
+	}
+
+	private static void addButtons(
+			Minecraft minecraft, AbstractContainerScreen<?> screen, AbstractContainerScreenAccessor window, ItemSearch search, boolean playerInventory
+	) {
+		AbstractContainerMenu menu = screen.getMenu();
 		List<AbstractWidget> widgets = Screens.getWidgets(screen);
-		ItemSearch search = ItemSearch.attach(screen, window, widgets);
 
 		Runnable sortInventory = () -> InventoryActions.sort(minecraft, menu, InventoryActions.storageSlots(menu));
+		Runnable undo = () -> InventoryActions.undo(minecraft, menu);
 		Map<KeyMapping, Runnable> keys = new LinkedHashMap<>();
 		keys.put(InventoryKitClient.sortInventoryKey, sortInventory);
+		keys.put(InventoryKitClient.undoKey, undo);
 
 		if (playerInventory) {
 			IntSupplier y = () -> window.getTopPos() + INVENTORY_BUTTON_Y;
-			widgets.add(sortButton(minecraft, column(window, 0), y, sortInventory));
+			widgets.add(undoButton(column(window, 2), y, menu, undo));
 			widgets.add(searchButton(column(window, 1), y, search));
+			widgets.add(sortButton(minecraft, column(window, 0), y, sortInventory));
 			registerKeys(screen, search, keys);
 			return;
 		}
@@ -94,6 +141,7 @@ public final class ContainerButtons {
 		widgets.add(button(column(window, 1), containerRow, IconButton.TAKE_ALL, "take_all", takeAll));
 		widgets.add(sortButton(minecraft, column(window, 0), containerRow, sortContainer));
 
+		widgets.add(undoButton(column(window, 3), inventoryRow, menu, undo));
 		widgets.add(button(column(window, 2), inventoryRow, IconButton.DEPOSIT_MATCHING, "deposit_matching", depositMatching));
 		widgets.add(button(column(window, 1), inventoryRow, IconButton.DEPOSIT_ALL, "deposit_all", depositAll));
 		widgets.add(sortButton(minecraft, column(window, 0), inventoryRow, sortInventory));
@@ -126,6 +174,13 @@ public final class ContainerButtons {
 		Component name = Component.translatable("button.inventorykit." + key);
 		IconButton button = new IconButton(x, y, icon, name, shift -> action.run());
 		button.setTooltip(Tooltip.create(Component.translatable("button.inventorykit." + key + ".tooltip")));
+		return button;
+	}
+
+	/** Greyed out until there is something to undo. */
+	private static IconButton undoButton(IntSupplier x, IntSupplier y, AbstractContainerMenu menu, Runnable undo) {
+		IconButton button = button(x, y, IconButton.UNDO, "undo", undo);
+		button.enabledWhen(() -> InventoryActions.canUndo(menu));
 		return button;
 	}
 

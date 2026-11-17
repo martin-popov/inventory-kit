@@ -4,7 +4,7 @@
 	"key.inventorykit.shift_back": "Desplazar filas del inventario hacia atrás",
 	"key.inventorykit.shift_column": "Desplazar la columna seleccionada (con Mayús, al revés)",
 	"key.inventorykit.shift_column_back": "Desplazar la columna seleccionada hacia atrás",
-	"key.inventorykit.toggle_lock": "Bloquear o desbloquear la ranura seleccionada",
+	"key.inventorykit.toggle_lock": "Bloquear o desbloquear ranura (seleccionada o bajo el ratón)",
 	"key.inventorykit.search": "Buscar objetos (en cofres y en el inventario)",
 	"key.inventorykit.sort_container": "Ordenar el contenedor",
 	"key.inventorykit.sort_inventory": "Ordenar el inventario",
@@ -59,7 +59,7 @@
 	"config.inventorykit.deposit_from_hotbar": "Depositar desde la barra",
 	"config.inventorykit.deposit_from_hotbar.description": "Si los botones de depositar también mueven objetos de la barra. Las ranuras bloqueadas nunca se vacían.",
 	"config.inventorykit.group.locked": "Ranuras bloqueadas",
-	"config.inventorykit.group.locked.description": "La columna de una ranura bloqueada nunca se mueve. Las ranuras bloqueadas muestran un candado y una barra dorada.",
+	"config.inventorykit.group.locked.description": "Una ranura bloqueada nunca se desplaza, deposita ni ordena. Estas son las ranuras de la barra; para bloquear cualquier otra, señálala en el inventario y pulsa la tecla de bloqueo. Las ranuras bloqueadas muestran un candado.",
 	"config.inventorykit.locked_slot": "Bloquear ranura %s",
 	"config.inventorykit.modifier.none": "Ninguno",
 	"config.inventorykit.modifier.alt": "Alt",
@@ -70,5 +70,14 @@
 	"config.inventorykit.preview_mode.always": "Siempre",
 	"config.inventorykit.preview_mode.when_shifting": "Al desplazar",
 	"config.inventorykit.sort_mode.category": "Categoría",
-	"config.inventorykit.sort_mode.name": "Nombre"
+	"config.inventorykit.sort_mode.name": "Nombre",
+	"key.inventorykit.undo": "Deshacer la última acción del cofre",
+	"message.inventorykit.locked_storage": "Ranura del inventario bloqueada",
+	"message.inventorykit.unlocked_storage": "Ranura del inventario desbloqueada",
+	"button.inventorykit.undo": "Deshacer",
+	"button.inventorykit.undo.tooltip": "Deshacer\nDevuelve todo a donde estaba antes del último depósito, retirada u ordenación.",
+	"config.inventorykit.protect_in_use": "No desplazar mientras se usa un objeto",
+	"config.inventorykit.protect_in_use.description": "Ignora las teclas de desplazamiento mientras comes, apuntas con el arco, bloqueas o picas, para que el objeto no salga de tu mano.",
+	"config.inventorykit.clicks_per_tick": "Clics por tick en servidores",
+	"config.inventorykit.clicks_per_tick.description": "En servidores, ordenar y mover objetos se reparte a esta cantidad de clics por tick para que no parezca trampa. 0 lo envía todo de una vez. En un jugador siempre se envía todo de una vez."
 }

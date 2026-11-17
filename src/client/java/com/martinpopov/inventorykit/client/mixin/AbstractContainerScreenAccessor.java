@@ -4,6 +4,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.world.inventory.Slot;
 
 /** Reads where a container window sits on screen, so buttons can be placed on it. */
 @Mixin(AbstractContainerScreen.class)
@@ -22,4 +23,8 @@ public interface AbstractContainerScreenAccessor {
 
 	@Accessor("inventoryLabelY")
 	int getInventoryLabelY();
+
+	/** The slot under the mouse, or null. */
+	@Accessor("hoveredSlot")
+	Slot getHoveredSlot();
 }

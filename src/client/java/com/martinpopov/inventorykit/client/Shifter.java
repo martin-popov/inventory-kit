@@ -1,5 +1,6 @@
 package com.martinpopov.inventorykit.client;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.martinpopov.inventorykit.ShiftPlan;
@@ -16,6 +17,7 @@ import net.minecraft.world.item.ItemStack;
 public final class Shifter {
 	/** Ticks the preview stays visible after a shift in "when shifting" mode. */
 	private static final int PREVIEW_LINGER_TICKS = 50;
+	private static final int[] ROW_STARTS = {0, ShiftPlan.TOP_ROW_START, ShiftPlan.MIDDLE_ROW_START, ShiftPlan.BOTTOM_ROW_START};
 
 	private static int previewLingerTicks;
 
@@ -47,31 +49,35 @@ public final class Shifter {
 
 		int column = player.getInventory().getSelectedSlot();
 
-		if (!InventoryKitConfig.get().isLocked(column)) {
+		if (!isColumnLocked(column)) {
 			shift(minecraft, reverse, new int[] {column});
 		}
 	}
 
-	public static int[] unlockedColumns() {
+	/** A column stays put when any of its four slots is locked, since shifting moves all four. */
+	public static boolean isColumnLocked(int column) {
 		InventoryKitConfig config = InventoryKitConfig.get();
+
+		for (int rowStart : ROW_STARTS) {
+			if (config.isLocked(rowStart + column)) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	public static int[] unlockedColumns() {
+		int[] columns = new int[ShiftPlan.COLUMNS];
 		int count = 0;
 
 		for (int column = 0; column < ShiftPlan.COLUMNS; column++) {
-			if (!config.isLocked(column)) {
-				count++;
+			if (!isColumnLocked(column)) {
+				columns[count++] = column;
 			}
 		}
 
-		int[] columns = new int[count];
-		int index = 0;
-
-		for (int column = 0; column < ShiftPlan.COLUMNS; column++) {
-			if (!config.isLocked(column)) {
-				columns[index++] = column;
-			}
-		}
-
-		return columns;
+		return java.util.Arrays.copyOf(columns, count);
 	}
 
 	/**
@@ -109,7 +115,7 @@ public final class Shifter {
 	private static void shift(Minecraft minecraft, boolean reverse, int[] columns) {
 		LocalPlayer player = minecraft.player;
 
-		if (player == null || minecraft.gameMode == null || player.isSpectator()) {
+		if (player == null || minecraft.gameMode == null || player.isSpectator() || ClickQueue.isBusy()) {
 			return;
 		}
 
@@ -123,24 +129,39 @@ public final class Shifter {
 			return;
 		}
 
-		Inventory inventory = player.getInventory();
-		int steps = plannedSteps(inventory, reverse, columns);
-		List<ShiftPlan.Swap> swaps = ShiftPlan.swaps(reverse, steps, columns);
+		InventoryKitConfig config = InventoryKitConfig.get();
 
-		if (swaps.isEmpty()) {
+		// Swapping the item out of the player's hand part-way through eating, drawing a bow,
+		// blocking or mining would cancel what they are doing.
+		if (config.protectItemInUse && (player.isUsingItem() || minecraft.gameMode.isDestroying())) {
 			return;
 		}
 
+		Inventory inventory = player.getInventory();
+		int steps = plannedSteps(inventory, reverse, columns);
 		int containerId = player.inventoryMenu.containerId;
+		List<ClickQueue.Click> clicks = new ArrayList<>();
 
-		for (ShiftPlan.Swap swap : swaps) {
-			minecraft.gameMode.handleContainerInput(containerId, swap.slot(), swap.hotbarIndex(), ContainerInput.SWAP, player);
+		for (ShiftPlan.Swap swap : ShiftPlan.swaps(reverse, steps, columns)) {
+			clicks.add(new ClickQueue.Click(containerId, swap.slot(), swap.hotbarIndex(), ContainerInput.SWAP));
+		}
+
+		if (clicks.isEmpty()) {
+			return;
 		}
 
 		previewLingerTicks = PREVIEW_LINGER_TICKS;
-		InventoryKitConfig config = InventoryKitConfig.get();
 
-		if (config.animation) {
+		if (config.sound) {
+			float pitch = reverse ? 1.15F : 1.4F;
+			minecraft.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.ITEM_PICKUP, pitch, 0.2F));
+		}
+
+		ClickQueue.submit(minecraft, clicks, () -> {
+			if (!config.animation) {
+				return;
+			}
+
 			for (int column : columns) {
 				ItemStack stack = inventory.getItem(column);
 
@@ -149,11 +170,6 @@ public final class Shifter {
 					stack.setPopTime(5);
 				}
 			}
-		}
-
-		if (config.sound) {
-			float pitch = reverse ? 1.15F : 1.4F;
-			minecraft.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.ITEM_PICKUP, pitch, 0.2F));
-		}
+		});
 	}
 }

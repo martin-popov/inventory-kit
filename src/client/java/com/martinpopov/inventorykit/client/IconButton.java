@@ -1,5 +1,6 @@
 package com.martinpopov.inventorykit.client;
 
+import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import java.util.function.IntSupplier;
 
@@ -72,13 +73,25 @@ public class IconButton extends Button {
 			".....##"
 	};
 
+	public static final String[] UNDO = {
+			"..#....",
+			".##....",
+			"#####..",
+			".##..#.",
+			"..#..#.",
+			".....#.",
+			"..###.."
+	};
+
 	private static final int ICON_COLOR = 0xFFFFFFFF;
+	private static final int ICON_COLOR_DISABLED = 0xFFA0A0A0;
 	private static final int ICON_SHADOW = 0xFF3F3F3F;
 
 	private final String[] icon;
 	private final IntSupplier x;
 	private final IntSupplier y;
 	private final Consumer<Boolean> onPress;
+	private BooleanSupplier enabled = () -> true;
 
 	/** @param onPress called with whether Shift was held */
 	public IconButton(IntSupplier x, IntSupplier y, String[] icon, Component name, Consumer<Boolean> onPress) {
@@ -87,6 +100,12 @@ public class IconButton extends Button {
 		this.x = x;
 		this.y = y;
 		this.onPress = onPress;
+	}
+
+	/** Greys the button out whenever the condition is false. */
+	public void enabledWhen(BooleanSupplier enabled) {
+		this.enabled = enabled;
+		this.active = enabled.getAsBoolean();
 	}
 
 	public boolean isSortButton() {
@@ -112,7 +131,9 @@ public class IconButton extends Button {
 	protected void extractContents(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
 		setX(x.getAsInt());
 		setY(y.getAsInt());
+		active = enabled.getAsBoolean();
 		extractDefaultSprite(graphics);
+		int color = active ? ICON_COLOR : ICON_COLOR_DISABLED;
 
 		int left = getX() + 2;
 		int top = getY() + 2;
@@ -128,7 +149,7 @@ public class IconButton extends Button {
 		for (int row = 0; row < icon.length; row++) {
 			for (int column = 0; column < icon[row].length(); column++) {
 				if (icon[row].charAt(column) == '#') {
-					graphics.fill(left + column, top + row, left + column + 1, top + row + 1, ICON_COLOR);
+					graphics.fill(left + column, top + row, left + column + 1, top + row + 1, color);
 				}
 			}
 		}

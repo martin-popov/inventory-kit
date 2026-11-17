@@ -21,12 +21,14 @@ Armour, the offhand slot and the crafting grid are never touched.
 | Shift all rows | Tab, or Shift + Tab to reverse | On |
 | Shift one column | Alt + Tab moves only the column of the selected hotbar slot. There is also a separate, unbound "Shift Selected Column" key. | Alt |
 | Scroll-wheel shifting | Hold Alt and scroll. Down moves the rows down, up moves them back. Can be set to move only the selected column. | On, all rows |
-| Locked hotbar slots | Press Y to lock or unlock the selected hotbar slot. A locked slot's column never moves, and the deposit buttons leave it alone. It shows a padlock and a gold bar on the hotbar. | Y |
+| Locked slots | Press Y to lock or unlock the selected hotbar slot, or point at any inventory slot in a chest or inventory screen and press Y. A locked slot is never shifted, deposited or sorted, and shows a padlock. | Y |
 | Next-row preview | A small strip above the hotbar shows the row the next shift brings in. Hold Shift to see the reverse direction. Turn it on in the settings. | Off |
 | Feedback | A soft pop sound and a bounce on the items that arrive in the hotbar. | On |
 | Skip empty rows | Rows that are completely empty are jumped past, so the hotbar never lands on nothing. | On |
 
 With "skip empty rows" off, four presses always bring you back to where you started.
+
+Shifting moves a whole column at a time, so a lock on any slot keeps its entire column in place. The shift keys are also ignored while you are eating, aiming a bow, blocking or mining, so the item is not swapped out of your hand; this can be turned off in the settings.
 
 ## Chest buttons
 
@@ -38,11 +40,14 @@ Chests, barrels, shulker boxes, hoppers, dispensers and droppers get two rows of
 | Container | Take matching | Takes the items you already carry |
 | Container | Take everything | Empties the container into your inventory |
 | Container | Sort | Sorts the container |
+| Inventory | Undo | Puts everything back where it was before the last deposit, take or sort |
 | Inventory | Deposit matching | Moves the items the container already holds |
 | Inventory | Deposit everything | Empties your inventory into the container |
 | Inventory | Sort | Sorts your 27 storage slots |
 
-Both deposit buttons leave locked hotbar slots alone. The player inventory screen has its own sort and search buttons next to the recipe book button.
+Both deposit buttons leave locked slots alone. The player inventory screen has its own undo, search and sort buttons next to the recipe book button.
+
+Undo works while the screen stays open and as long as the same items are still there. If something was added or removed since, for example by a hopper, it does nothing.
 
 ## Sorting
 
@@ -51,7 +56,7 @@ Sorting merges half-full stacks, then puts everything in order with the gaps at 
 - **Category** (default): the order of the creative menu, tab by tab.
 - **Name**: alphabetical.
 
-Shift-click a sort button to switch between them, or change it in the settings. Your hotbar is never sorted. Bundles stay exactly where they are and the other items are sorted around them.
+Shift-click a sort button to switch between them, or change it in the settings. Your hotbar is never sorted. Locked slots and bundles stay exactly where they are and the other items are sorted around them.
 
 ## Search
 
@@ -69,7 +74,7 @@ The keys are listed under **Options → Controls → Key Binds → Inventory Kit
 
 ## Keyboard and accessibility
 
-- **No mouse needed.** Every chest button can be reached with Tab and pressed with Enter or Space, and each one also has its own key binding (unbound by default): sort container, sort inventory, deposit matching, deposit everything, take matching and take everything.
+- **No mouse needed.** Every chest button can be reached with Tab and pressed with Enter or Space, and each one also has its own key binding (unbound by default): sort container, sort inventory, deposit matching, deposit everything, take matching, take everything and undo.
 - **No held keys needed.** Shift + Tab, Alt + Tab and Alt + scroll are shortcuts. "Shift Inventory Rows Back", "Shift Selected Column" and "Shift Selected Column Back" are separate single keys you can bind instead.
 - **Narrator.** Buttons and the search box have spoken names, and locking or unlocking a slot is read out.
 - **Not colour-only.** Search dims the items that do not match as well as outlining the ones that do, and locked slots are marked with a padlock shape as well as a gold bar.
@@ -80,7 +85,7 @@ The keys are listed under **Options → Controls → Key Binds → Inventory Kit
 
 The mod does nothing you could not do by hand. Shifting sends ordinary "swap with hotbar slot" clicks, depositing and taking send shift-clicks, and sorting sends left-clicks. It works in single player and on servers without a server-side mod.
 
-Everything happens in one go: a row shift is 27 clicks and sorting a double chest can be well over a hundred. Servers with strict anti-cheat may not like that many clicks in one tick.
+In single player everything happens at once. On a server the clicks are spread out, 12 per tick by default, because a hundred clicks arriving in one tick is what anti-cheat plugins look for. A full sort of a double chest then takes under a second, and the screen ignores input until it finishes. The rate can be changed in the settings; 0 sends everything at once.
 
 ## Requirements
 

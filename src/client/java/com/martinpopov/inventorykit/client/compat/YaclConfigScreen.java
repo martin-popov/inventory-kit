@@ -48,6 +48,7 @@ public final class YaclConfigScreen {
 								.option(toggle("skip_empty", defaults.skipEmptyRows, () -> config.skipEmptyRows, value -> config.skipEmptyRows = value))
 								.option(choice("column_modifier", InventoryKitConfig.Modifier.class, "modifier",
 										defaults.columnModifier, () -> config.columnModifier, value -> config.columnModifier = value))
+								.option(toggle("protect_in_use", defaults.protectItemInUse, () -> config.protectItemInUse, value -> config.protectItemInUse = value))
 								.build())
 						.group(OptionGroup.createBuilder()
 								.name(text("group.scroll"))
@@ -79,6 +80,12 @@ public final class YaclConfigScreen {
 								.option(choice("sort_mode", InventoryKitConfig.SortMode.class, "sort_mode",
 										defaults.sortMode, () -> config.sortMode, value -> config.sortMode = value))
 								.option(toggle("deposit_from_hotbar", defaults.depositFromHotbar, () -> config.depositFromHotbar, value -> config.depositFromHotbar = value))
+								.option(Option.<Integer>createBuilder()
+										.name(text("clicks_per_tick"))
+										.description(OptionDescription.of(text("clicks_per_tick.description")))
+										.binding(defaults.multiplayerClicksPerTick, () -> config.multiplayerClicksPerTick, value -> config.multiplayerClicksPerTick = value)
+										.controller(option -> IntegerSliderControllerBuilder.create(option).range(0, 60).step(1))
+										.build())
 								.build())
 						.group(lockedSlots.build())
 						.build())

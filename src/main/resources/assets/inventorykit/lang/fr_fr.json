@@ -4,7 +4,7 @@
 	"key.inventorykit.shift_back": "Décaler les rangées de l'inventaire en arrière",
 	"key.inventorykit.shift_column": "Décaler la colonne sélectionnée (Maj pour inverser)",
 	"key.inventorykit.shift_column_back": "Décaler la colonne sélectionnée en arrière",
-	"key.inventorykit.toggle_lock": "Verrouiller ou déverrouiller l'emplacement sélectionné",
+	"key.inventorykit.toggle_lock": "Verrouiller ou déverrouiller l'emplacement (sélectionné ou sous la souris)",
 	"key.inventorykit.search": "Rechercher des objets (coffres et inventaire)",
 	"key.inventorykit.sort_container": "Trier le conteneur",
 	"key.inventorykit.sort_inventory": "Trier l'inventaire",
@@ -59,7 +59,7 @@
 	"config.inventorykit.deposit_from_hotbar": "Déposer depuis la barre",
 	"config.inventorykit.deposit_from_hotbar.description": "Si les boutons de dépôt déplacent aussi les objets de la barre. Les emplacements verrouillés ne sont jamais vidés.",
 	"config.inventorykit.group.locked": "Emplacements verrouillés",
-	"config.inventorykit.group.locked.description": "La colonne d'un emplacement verrouillé ne bouge jamais. Les emplacements verrouillés affichent un cadenas et une barre dorée.",
+	"config.inventorykit.group.locked.description": "Un emplacement verrouillé n'est jamais décalé, déposé ni trié. Voici ceux de la barre ; pour verrouiller un autre emplacement, pointez-le dans l'inventaire et appuyez sur la touche de verrouillage. Les emplacements verrouillés affichent un cadenas.",
 	"config.inventorykit.locked_slot": "Verrouiller l'emplacement %s",
 	"config.inventorykit.modifier.none": "Aucun",
 	"config.inventorykit.modifier.alt": "Alt",
@@ -70,5 +70,14 @@
 	"config.inventorykit.preview_mode.always": "Toujours",
 	"config.inventorykit.preview_mode.when_shifting": "Pendant le décalage",
 	"config.inventorykit.sort_mode.category": "Catégorie",
-	"config.inventorykit.sort_mode.name": "Nom"
+	"config.inventorykit.sort_mode.name": "Nom",
+	"key.inventorykit.undo": "Annuler la dernière action du coffre",
+	"message.inventorykit.locked_storage": "Emplacement d'inventaire verrouillé",
+	"message.inventorykit.unlocked_storage": "Emplacement d'inventaire déverrouillé",
+	"button.inventorykit.undo": "Annuler",
+	"button.inventorykit.undo.tooltip": "Annuler\nRemet tout là où c'était avant le dernier dépôt, retrait ou tri.",
+	"config.inventorykit.protect_in_use": "Ne pas décaler pendant l'utilisation d'un objet",
+	"config.inventorykit.protect_in_use.description": "Ignore les touches de décalage quand vous mangez, bandez un arc, bloquez ou minez, pour que l'objet ne quitte pas votre main.",
+	"config.inventorykit.clicks_per_tick": "Clics par tick sur les serveurs",
+	"config.inventorykit.clicks_per_tick.description": "Sur les serveurs, le tri et les déplacements sont étalés à ce nombre de clics par tick pour ne pas ressembler à de la triche. 0 envoie tout d'un coup. En solo, tout est toujours envoyé d'un coup."
 }

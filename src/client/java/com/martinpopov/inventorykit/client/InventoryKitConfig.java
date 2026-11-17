@@ -9,7 +9,6 @@ import java.nio.file.Path;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonParseException;
-import com.martinpopov.inventorykit.ShiftPlan;
 import com.mojang.blaze3d.platform.InputConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,6 +22,9 @@ public final class InventoryKitConfig {
 	private static final Path PATH = FabricLoader.getInstance().getConfigDir().resolve("inventorykit.json");
 	/** Settings file from when the mod was called Inventory Shift. */
 	private static final Path OLD_PATH = FabricLoader.getInstance().getConfigDir().resolve("inventoryshift.json");
+
+	/** The player's 36 inventory slots. */
+	public static final int LOCKABLE_SLOTS = 36;
 
 	private static InventoryKitConfig instance = new InventoryKitConfig();
 
@@ -67,8 +69,17 @@ public final class InventoryKitConfig {
 	public Modifier scrollModifier = Modifier.ALT;
 	public ScrollTarget scrollTarget = ScrollTarget.ROWS;
 
-	/** Hotbar slots (0-8) whose column never moves. */
-	public boolean[] lockedSlots = new boolean[ShiftPlan.COLUMNS];
+	/**
+	 * Locked inventory slots: 0-8 are the hotbar, 9-35 the storage rows. A locked slot is never
+	 * shifted, deposited or sorted.
+	 */
+	public boolean[] lockedSlots = new boolean[LOCKABLE_SLOTS];
+
+	/** Leave the inventory alone while the player is eating, aiming, blocking or mining. */
+	public boolean protectItemInUse = true;
+
+	/** On servers, how many clicks to send each tick. 0 sends everything at once. Single player always does. */
+	public int multiplayerClicksPerTick = 12;
 
 	public PreviewMode previewMode = PreviewMode.OFF;
 	/** Extra pixels to raise the preview strip by; negative lowers it. */
@@ -87,8 +98,9 @@ public final class InventoryKitConfig {
 		return instance;
 	}
 
-	public boolean isLocked(int column) {
-		return column >= 0 && column < lockedSlots.length && lockedSlots[column];
+	/** @param slot an inventory slot number: 0-8 hotbar, 9-35 storage */
+	public boolean isLocked(int slot) {
+		return slot >= 0 && slot < lockedSlots.length && lockedSlots[slot];
 	}
 
 	public static void load() {
@@ -147,8 +159,9 @@ public final class InventoryKitConfig {
 			sortMode = defaults.sortMode;
 		}
 
-		if (lockedSlots == null || lockedSlots.length != ShiftPlan.COLUMNS) {
-			boolean[] fixed = new boolean[ShiftPlan.COLUMNS];
+		// Older versions only stored the nine hotbar slots; those carry over as slots 0-8.
+		if (lockedSlots == null || lockedSlots.length != LOCKABLE_SLOTS) {
+			boolean[] fixed = new boolean[LOCKABLE_SLOTS];
 
 			if (lockedSlots != null) {
 				System.arraycopy(lockedSlots, 0, fixed, 0, Math.min(lockedSlots.length, fixed.length));

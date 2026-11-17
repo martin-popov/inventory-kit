@@ -26,7 +26,8 @@ public class InventoryKitClient implements ClientModInitializer {
 	private static KeyMapping shiftBackKey;
 	private static KeyMapping columnKey;
 	private static KeyMapping columnBackKey;
-	private static KeyMapping lockKey;
+	/** Also works on the slot under the mouse in inventory screens. */
+	public static KeyMapping lockKey;
 
 	// Used inside chests and the inventory. Every button has one, so nothing needs the mouse.
 	public static KeyMapping searchKey;
@@ -36,6 +37,7 @@ public class InventoryKitClient implements ClientModInitializer {
 	public static KeyMapping depositAllKey;
 	public static KeyMapping takeMatchingKey;
 	public static KeyMapping takeAllKey;
+	public static KeyMapping undoKey;
 
 	@Override
 	public void onInitializeClient() {
@@ -54,6 +56,7 @@ public class InventoryKitClient implements ClientModInitializer {
 		depositAllKey = register("deposit_all", UNBOUND);
 		takeMatchingKey = register("take_matching", UNBOUND);
 		takeAllKey = register("take_all", UNBOUND);
+		undoKey = register("undo", UNBOUND);
 
 		ContainerButtons.register();
 		ClientTickEvents.END_CLIENT_TICK.register(InventoryKitClient::onEndTick);
@@ -79,6 +82,7 @@ public class InventoryKitClient implements ClientModInitializer {
 
 	private static void onEndTick(Minecraft minecraft) {
 		Shifter.tick();
+		ClickQueue.tick(minecraft);
 
 		while (shiftKey.consumeClick()) {
 			if (InventoryKitConfig.get().columnModifier.isDown()) {
@@ -102,24 +106,29 @@ public class InventoryKitClient implements ClientModInitializer {
 		}
 
 		while (lockKey.consumeClick()) {
-			toggleLock(minecraft);
+			LocalPlayer player = minecraft.player;
+
+			if (player != null) {
+				toggleLock(minecraft, player.getInventory().getSelectedSlot());
+			}
 		}
 	}
 
-	private static void toggleLock(Minecraft minecraft) {
+	/** @param slot an inventory slot number: 0-8 hotbar, 9-35 storage */
+	public static void toggleLock(Minecraft minecraft, int slot) {
 		LocalPlayer player = minecraft.player;
+		InventoryKitConfig config = InventoryKitConfig.get();
 
-		if (player == null || player.isSpectator()) {
+		if (player == null || player.isSpectator() || slot < 0 || slot >= config.lockedSlots.length) {
 			return;
 		}
 
-		InventoryKitConfig config = InventoryKitConfig.get();
-		int column = player.getInventory().getSelectedSlot();
-		config.lockedSlots[column] = !config.lockedSlots[column];
+		config.lockedSlots[slot] = !config.lockedSlots[slot];
 		InventoryKitConfig.save();
 
-		String key = config.lockedSlots[column] ? "message.inventorykit.locked" : "message.inventorykit.unlocked";
-		Component message = Component.translatable(key, column + 1);
+		boolean hotbar = slot < 9;
+		String key = "message.inventorykit." + (config.lockedSlots[slot] ? "locked" : "unlocked") + (hotbar ? "" : "_storage");
+		Component message = hotbar ? Component.translatable(key, slot + 1) : Component.translatable(key);
 		minecraft.gui.hud.setOverlayMessage(message, false);
 		// The message above the hotbar is not read out, so say it for narrator users.
 		minecraft.getNarrator().saySystemNow(message);

@@ -17,15 +17,6 @@ public final class ShiftHud implements HudElement {
 	private static final int SLOT_SIZE = 18;
 	private static final float PREVIEW_SCALE = 0.75F;
 	private static final int PREVIEW_BACKGROUND = 0x66000000;
-	private static final int LOCK_COLOR = 0xFFFFD040;
-	private static final int LOCK_BACKING = 0xE0000000;
-	private static final String[] PADLOCK = {
-			".###.",
-			"#...#",
-			"#####",
-			"##.##",
-			"#####"
-	};
 
 	@Override
 	public void extractRenderState(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker) {
@@ -56,21 +47,9 @@ public final class ShiftHud implements HudElement {
 			int x = hotbarLeft + column * 20;
 
 			// A bar the full width of the slot, under the item.
-			graphics.fill(x, itemTop + 16, x + 16, itemTop + 18, LOCK_COLOR);
+			graphics.fill(x, itemTop + 16, x + 16, itemTop + 18, LockBadge.COLOR);
 
-			// A padlock badge on a dark backing in the slot's top-left corner, so the lock does
-			// not depend on colour alone and stays visible over any item.
-			int badgeLeft = x - 2;
-			int badgeTop = itemTop - 2;
-			graphics.fill(badgeLeft, badgeTop, badgeLeft + PADLOCK[0].length() + 2, badgeTop + PADLOCK.length + 2, LOCK_BACKING);
-
-			for (int row = 0; row < PADLOCK.length; row++) {
-				for (int pixel = 0; pixel < PADLOCK[row].length(); pixel++) {
-					if (PADLOCK[row].charAt(pixel) == '#') {
-						graphics.fill(badgeLeft + 1 + pixel, badgeTop + 1 + row, badgeLeft + 2 + pixel, badgeTop + 2 + row, LOCK_COLOR);
-					}
-				}
-			}
+			LockBadge.extract(graphics, x, itemTop);
 		}
 	}
 
