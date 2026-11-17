@@ -6,6 +6,7 @@ import java.util.function.IntSupplier;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.input.InputWithModifiers;
+import net.minecraft.client.input.KeyEvent;
 import net.minecraft.network.chat.Component;
 
 /**
@@ -96,6 +97,20 @@ public class IconButton extends Button {
 	@Override
 	public void onPress(InputWithModifiers input) {
 		onPress.accept(input.hasShiftDown());
+	}
+
+	/**
+	 * These buttons are mouse-only. A clicked vanilla button stays focused, which would leave it
+	 * highlighted and let Space or Enter press it again while the player is using the inventory.
+	 */
+	@Override
+	public void setFocused(boolean focused) {
+		super.setFocused(false);
+	}
+
+	@Override
+	public boolean keyPressed(KeyEvent event) {
+		return false;
 	}
 
 	@Override
